@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Налоговая служба Московского района Бишкек</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #34495e;
+            --success-color: #27ae60;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,192C672,181,768,139,864,138.7C960,139,1056,181,1152,181.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .contact-info {
+            text-align: right;
+        }
+        
+        .contact-info p {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .contact-info i {
+            color: var(--accent-color);
+        }
+        
+        .hero {
+            background: linear-gradient(120deg, var(--secondary-color), #2980b9);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,128L48,138.7C96,149,192,171,288,186.7C384,203,480,213,576,202.7C672,192,768,160,864,149.3C960,139,1056,149,1152,165.3C1248,181,1344,203,1392,213.3L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            margin: -40px auto 40px;
+            position: relative;
+            z-index: 10;
+            padding: 0 20px;
+            max-width: 1200px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            overflow-x: auto;
+            justify-content: center;
+        }
+        
+        .tab-button {
+            padding: 18px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab-button:hover {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+        }
+        
+        .tab-button.active {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 50px 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 40px;
+            min-height: 600px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-color);
+            position: relative;
+            font-size: 2rem;
+        }
+        
+        .tab-content h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+            border-radius: 3px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border-top: 5px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+        }
+        
+        .info-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+        }
+        
+        .info-card h3 i {
+            color: var(--accent-color);
+            font-size: 1.6rem;
+        }
+        
+        .services-list, .documents-list {
+            list-style-type: none;
+        }
+        
+        .services-list li, .documents-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+        
+        .services-list li:hover, .documents-list li:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+            padding-left: 10px;
+            border-radius: 5px;
+        }
+        
+        .services-list li:last-child, .documents-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .services-list li i, .documents-list li i {
+            color: var(--success-color);
+            font-size: 1.1rem;
+        }
+        
+        .contact-details {
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            margin-bottom: 25px;
+            align-items: flex-start;
+            gap: 20px;
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .contact-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .map-container {
+            margin-top: 30px;
+            height: 400px;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: var(--border-radius);
+        }
+        
+        .map-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        }
+        
+        .map-placeholder i {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            opacity: 0.7;
+        }
+        
+        .leaders-section {
+            margin-top: 40px;
+        }
+        
+        .leaders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .leader-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .leader-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .leader-avatar {
+            height: 200px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+        
+        .leader-info {
+            padding: 25px 20px;
+        }
+        
+        .leader-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+        
+        .leader-position {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .leader-contact {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: left;
+        }
+        
+        .leader-contact p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        footer {
+            background: linear-gradient(120deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .footer-section ul {
+            list-style-type: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background: var(--accent-color);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--accent-color), #c0392b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(135deg, #c0392b, var(--accent-color));
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(135deg, #2980b9, var(--secondary-color));
+        }
+        
+        .statistics {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 50px 0;
+            text-align: center;
+        }
+        
+        .stat-item {
+            margin: 15px;
+            padding: 25px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            min-width: 180px;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-text {
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .gallery-section {
+            margin-top: 40px;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .gallery-item {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            height: 200px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .feature-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .feature {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+            
+            .contact-info {
+                text-align: center;
+            }
+            
+            .contact-info p {
+                justify-content: center;
+            }
+            
+            .tab-buttons {
+                justify-content: flex-start;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .tab-content h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Налоговая служба Московского района</h1>
+                        <p>г. Бишкек, Кыргызская Республика</p>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-20</p>
+                    <p><i class="fas fa-envelope"></i> nalog.moskva@bishkek.kg</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ул. Московская, 123</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="hero">
+        <div class="container hero-content">
+            <h1>Эффективное налоговое администрирование</h1>
+            <p>Современные услуги для граждан и бизнеса Московского района Бишкек</p>
+            <a href="#contacts" class="btn">Связаться с нами</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="about"><i class="fas fa-info-circle"></i> О нас</button>
+                <button class="tab-button" data-tab="services"><i class="fas fa-concierge-bell"></i> Услуги</button>
+                <button class="tab-button" data-tab="documents"><i class="fas fa-file-alt"></i> Документы</button>
+                <button class="tab-button" data-tab="leaders"><i class="fas fa-users"></i> Руководство</button>
+                <button class="tab-button" data-tab="online"><i class="fas fa-laptop-code"></i> Онлайн-сервисы</button>
+                <button class="tab-button" data-tab="contacts"><i class="fas fa-address-book"></i> Контакты</button>
+            </div>
+        </div>
+        
+        <div class="tab-content active" id="about">
+            <div class="container">
+                <h2>О налоговой службе Московского района</h2>
+                <p>Налоговая служба Московского района города Бишкек является структурным подразделением Государственной налоговой службы при Правительстве Кыргызской Республики. Мы осуществляем администрирование налогов и сборов на территории Московского района, который является одним из крупнейших и наиболее экономически развитых районов столицы.</p>
+                
+                <div class="feature-highlights">
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Эффективность</h3>
+                        <p>Современные методы налогового администрирования</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Партнерство</h3>
+                        <p>Взаимовыгодное сотрудничество с налогоплательщиками</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Надежность</h3>
+                        <p>Гарантия конфиденциальности и защиты данных</p>
+                    </div>
+                </div>
+                
+                <div class="statistics">
+                    <div class="stat-item">
+                        <div class="stat-number">28</div>
+                        <div class="stat-text">лет успешной работы</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">15,240</div>
+                        <div class="stat-text">налогоплательщиков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">142</div>
+                        <div class="stat-text">сотрудника</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-text">удовлетворенность клиентов</div>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-bullseye"></i> Наша миссия</h3>
+                        <p>Обеспечение полноты и своевременности поступления налогов и сборов в бюджет, создание комфортных условий для добросовестных налогоплательщиков, содействие развитию предпринимательства в районе.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-chart-line"></i> Наши цели</h3>
+                        <p>Повышение уровня налоговой дисциплины, совершенствование налогового администрирования, обеспечение качества предоставляемых услуг, внедрение современных технологий в работу службы.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-clock"></i> Часы работы</h3>
+                        <p><strong>Пн-Чт:</strong> 9:00 - 18:00</p>
+                        <p><strong>Пт:</strong> 9:00 - 17:00</p>
+                        <p><strong>Обед:</strong> 13:00 - 14:00</p>
+                        <p><strong>Сб-Вс:</strong> выходные</p>
+                        <p>Прием граждан: до 17:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="services">
+            <div class="container">
+                <h2>Предоставляемые услуги</h2>
+                <p>Наша налоговая служба предоставляет широкий спектр услуг для физических и юридических лиц, индивидуальных предпринимателей и субъектов малого бизнеса:</p>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-user"></i> Для физических лиц</h3>
+                        <ul class="services-list">
+                            <li><i class="fas fa-check"></i> Регистрация и постановка на учет</li>
+                            <li><i class="fas fa-check"></i> Консультации по налогообложению</li>
+                            <li><i class="fas fa-check"></i> Прием налоговых деклараций</li>
+                            <li><i class="fas fa-check"></i> Выдача справок о состоянии расчетов</li>
+                            <li><i class="fas fa-check"></i> Прием платежей по налогам и сборам</li>
+                            <li><i class="fas fa-check"></i> Оформление налоговых льгот</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-building"></i> Для юридических лиц</h3>
+                        <ul class="services-list">
+                            <li><i class="fas fa-check"></i> Государственная регистрация юридических лиц</li>
+                            <li><i class="fas fa-check"></i> Постановка на учет в налоговом органе</li>
+                            <li><i class="fas fa-check"></i> Консультации по налогообложению</li>
+                            <li><i class="fas fa-check"></i> Прием налоговой отчетности</li>
+                            <li><i class="fas fa-check"></i> Выдача разрешительных документов</li>
+                            <li><i class="fas fa-check"></i> Сопровождение инвестиционных проектов</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-laptop-code"></i> Электронные услуги</h3>
+                        <ul class="services-list">
+                            <li><i class="fas fa-check"></i> Электронная подача деклараций</li>
+                            <li><i class="fas fa-check"></i> Онлайн-консультации</li>
+                            <li><i class="fas fa-check"></i> Электронная регистрация</li>
+                            <li><i class="fas fa-check"></i> Онлайн-запись на прием</li>
+                            <li><i class="fas fa-check"></i> Проверка состояния расчетов</li>
+                            <li><i class="fas fa-check"></i> Получение электронных справок</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="documents">
+            <div class="container">
+                <h2>Нормативные документы и формы</h2>
+                <p>На этой странице вы можете найти необходимые документы и бланки для работы с налоговой службой. Все документы доступны для скачивания в формате PDF.</p>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-file-invoice"></i> Налоговые формы</h3>
+                        <ul class="documents-list">
+                            <li><i class="fas fa-download"></i> Декларация по НДС</li>
+                            <li><i class="fas fa-download"></i> Декларация по налогу на прибыль</li>
+                            <li><i class="fas fa-download"></i> Декларация по подоходному налогу</li>
+                            <li><i class="fas fa-download"></i> Расчет по земельному налогу</li>
+                            <li><i class="fas fa-download"></i> Расчет по налогу на имущество</li>
+                            <li><i class="fas fa-download"></i> Форма налогового уведомления</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-edit"></i> Заявления</h3>
+                        <ul class="documents-list">
+                            <li><i class="fas fa-download"></i> Заявление о постановке на учет</li>
+                            <li><i class="fas fa-download"></i> Заявление о предоставлении отсрочки</li>
+                            <li><i class="fas fa-download"></i> Заявление о возврате излишне уплаченного налога</li>
+                            <li><i class="fas fa-download"></i> Заявление о предоставлении налогового кредита</li>
+                            <li><i class="fas fa-download"></i> Заявление о закрытии деятельности</li>
+                            <li><i class="fas fa-download"></i> Заявление на получение льготы</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-gavel"></i> Нормативные акты</h3>
+                        <ul class="documents-list">
+                            <li><i class="fas fa-download"></i> Налоговый кодекс КР</li>
+                            <li><i class="fas fa-download"></i> Закон о налоговой службе</li>
+                            <li><i class="fas fa-download"></i> Инструкции и разъяснения</li>
+                            <li><i class="fas fa-download"></i> Международные соглашения</li>
+                            <li><i class="fas fa-download"></i> Решения местных органов власти</li>
+                            <li><i class="fas fa-download"></i> Изменения в налоговом законодательстве</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="leaders">
+            <div class="container">
+                <h2>Руководство налоговой службы</h2>
+                <p>Знакомьтесь с руководящим составом налоговой службы Московского района. Наши специалисты имеют многолетний опыт работы в сфере налогообложения и всегда готовы помочь вам в решении вопросов.</p>
+                
+                <div class="leaders-section">
+                    <div class="leaders-grid">
+                        <div class="leader-card">
+                            <div class="leader-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="leader-info">
+                                <h3>Алиев Нурлан Темирбекович</h3>
+                                <div class="leader-position">Начальник налоговой службы</div>
+                                <div class="leader-contact">
+                                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-21</p>
+                                    <p><i class="fas fa-envelope"></i> n.aliyev@nalog.kg</p>
+                                    <p><i class="fas fa-clock"></i> Прием: вторник, четверг 10:00-12:00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="leader-card">
+                            <div class="leader-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="leader-info">
+                                <h3>Исакова Гульнара Сапарбековна</h3>
+                                <div class="leader-position">Заместитель начальника</div>
+                                <div class="leader-contact">
+                                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-22</p>
+                                    <p><i class="fas fa-envelope"></i> g.isakova@nalog.kg</p>
+                                    <p><i class="fas fa-clock"></i> Прием: понедельник, среда 14:00-16:00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="leader-card">
+                            <div class="leader-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="leader-info">
+                                <h3>Жумабаев Айбек Канатбекович</h3>
+                                <div class="leader-position">Начальник отдела контроля</div>
+                                <div class="leader-contact">
+                                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-23</p>
+                                    <p><i class="fas fa-envelope"></i> a.jumabayev@nalog.kg</p>
+                                    <p><i class="fas fa-clock"></i> Прием: ежедневно 9:00-11:00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="leader-card">
+                            <div class="leader-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="leader-info">
+                                <h3>Садыкова Айгуль Маратовна</h3>
+                                <div class="leader-position">Начальник отдела регистрации</div>
+                                <div class="leader-contact">
+                                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-24</p>
+                                    <p><i class="fas fa-envelope"></i> a.sadykova@nalog.kg</p>
+                                    <p><i class="fas fa-clock"></i> Прием: ежедневно 14:00-16:00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="online">
+            <div class="container">
+                <h2>Онлайн-сервисы</h2>
+                <p>Воспользуйтесь нашими электронными услугами для экономии времени. Все сервисы доступны 24/7 и не требуют посещения инспекции.</p>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-user-circle"></i> Личный кабинет налогоплательщика</h3>
+                        <p>Доступ к персональной информации, подача деклараций, отслеживание статуса заявлений, получение уведомлений.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Войти в кабинет</button>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-file-export"></i> Электронная отчетность</h3>
+                        <p>Возможность подачи налоговой отчетности в электронном виде без посещения инспекции. Поддержка всех видов деклараций.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Перейти к отчетности</button>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-calendar-check"></i> Онлайн-запись на прием</h3>
+                        <p>Запишитесь на прием к специалисту в удобное для вас время, избежав очередей. Выберите дату, время и специалиста.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Записаться на прием</button>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-calculator"></i> Налоговый калькулятор</h3>
+                        <p>Рассчитайте суммы налогов с помощью нашего онлайн-калькулятора. Доступны расчеты для физических и юридических лиц.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Открыть калькулятор</button>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-search"></i> Проверка контрагентов</h3>
+                        <p>Проверьте надежность ваших партнеров по бизнесу. Узнайте об их налоговой дисциплине и наличии задолженностей.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Проверить контрагента</button>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-question-circle"></i> Вопросы и ответы</h3>
+                        <p>Найдите ответы на часто задаваемые вопросы по налогообложению. Если не нашли ответ - задайте свой вопрос специалисту.</p>
+                        <button class="btn btn-secondary" style="margin-top: 15px;">Перейти к FAQ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="contacts">
+            <div class="container">
+                <h2>Контакты и обратная связь</h2>
+                <p>Свяжитесь с нами удобным для вас способом. Мы всегда готовы ответить на ваши вопросы и оказать необходимую помощь.</p>
+                
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h3>Адрес</h3>
+                            <p>г. Бишкек, Московский район, ул. Московская, 123</p>
+                            <p>Почтовый индекс: 720000</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h3>Телефоны</h3>
+                            <p>Справочная служба: +996 (312) 54-10-20</p>
+                            <p>Канцелярия: +996 (312) 54-10-25</p>
+                            <p>Факс: +996 (312) 54-10-26</p>
+                            <p>Горячая линия: 1234 (бесплатно с городских телефонов)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h3>Электронная почта</h3>
+                            <p>Общие вопросы: nalog.moskva@bishkek.kg</p>
+                            <p>Техническая поддержка: support.moskva@bishkek.kg</p>
+                            <p>Жалобы и предложения: complaints.moskva@bishkek.kg</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <h3>Режим работы</h3>
+                            <p>Понедельник - Четверг: 9:00 - 18:00</p>
+                            <p>Пятница: 9:00 - 17:00</p>
+                            <p>Обеденный перерыв: 13:00 - 14:00</p>
+                            <p>Суббота, Воскресенье: выходные дни</p>
+                            <p>Прием граждан: до 17:00 ежедневно</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Налоговая служба</h3>
+                    <p>Московского района г. Бишкек</p>
+                    <p>Государственная налоговая служба при Правительстве Кыргызской Республики</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Полезные ссылки</h3>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Портал государственных услуг</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Министерство финансов КР</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Налоговый кодекс КР</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Статистика</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Формы и бланки</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> г. Бишкек, ул. Московская, 123</p>
+                    <p><i class="fas fa-phone"></i> +996 (312) 54-10-20</p>
+                    <p><i class="fas fa-envelope"></i> nalog.moskva@bishkek.kg</p>
+                    <p><i class="fas fa-clock"></i> Пн-Чт: 9:00-18:00, Пт: 9:00-17:00</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 Налоговая служба Московского района г. Бишкек. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Убираем активный класс у всех кнопок и контента
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Добавляем активный класс к нажатой кнопке
+                    button.classList.add('active');
+                    
+                    // Показываем соответствующий контент
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Если открываем вкладку с картой, инициализируем карту
+                    if (tabId === 'contacts') {
+                        setTimeout(initMap, 300);
+                    }
+                });
+            });
+            
+            // Плавная прокрутка для якорных ссылок
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Анимация статистики при прокрутке
+            const observerOptions = {
+                threshold: 0.5
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const statItems = entry.target.querySelectorAll('.stat-item');
+                        statItems.forEach((item, index) => {
+                            setTimeout(() => {
+                                item.style.opacity = '1';
+                                item.style.transform = 'translateY(0)';
+                            }, index * 200);
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            const aboutSection = document.getElementById('about');
+            if (aboutSection) {
+                observer.observe(aboutSection);
+            }
+            
+            // Инициализация карты
+            function initMap() {
+                // Координаты налоговой службы Московского района Бишкек
+                const taxOfficeCoords = [42.8746, 74.5698];
+                
+                // Создаем карту
+                const map = L.map('map').setView(taxOfficeCoords, 16);
+                
+                // Добавляем слой карты
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                
+                // Добавляем маркер
+                const taxOfficeMarker = L.marker(taxOfficeCoords).addTo(map);
+                taxOfficeMarker.bindPopup(`
+                    <div style="text-align: center;">
+                        <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Налоговая служба Московского района</h3>
+                        <p style="margin: 5px 0;">г. Бишкек, ул. Московская, 123</p>
+                        <p style="margin: 5px 0;">+996 (312) 54-10-20</p>
+                    </div>
+                `).openPopup();
+                
+                // Добавляем круг вокруг маркера
+                L.circle(taxOfficeCoords, {
+                    color: '#3498db',
+                    fillColor: '#3498db',
+                    fillOpacity: 0.1,
+                    radius: 100
+                }).addTo(map);
+            }
+            
+            // Инициализируем карту при загрузке, если активна вкладка контактов
+            if (document.getElementById('contacts').classList.contains('active')) {
+                initMap();
+            }
+        });
+    </script>
+</body>
+</html>
+09:59
+
+
